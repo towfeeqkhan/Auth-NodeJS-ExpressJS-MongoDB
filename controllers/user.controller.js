@@ -1,9 +1,23 @@
 import bcrypt from "bcrypt";
+import { z } from "zod";
 import User from "../models/user.model.js";
+import { formatZodError } from "../utils/zodError.helper.js";
+import { signupSchema } from "../validators/user.validator.js";
 
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const validation = signupSchema.safeParse(req.body);
+
+    if (!validation.success) {
+      console.log(z.prettifyError(validation.error));
+
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: formatZodError(validation.error),
+      });
+    }
+
+    const { name, email, password, role } = validation.data;
 
     const existingUser = await User.findOne({ email });
 
@@ -17,10 +31,12 @@ export const createUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      role,
     });
-    res
-      .status(201)
-      .json({ message: "User created successfully", user: newUser });
+    res.status(201).json({
+      message: "User created successfully",
+      user: { name: newUser.name, email: newUser.email, role: newUser.role },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error" });
