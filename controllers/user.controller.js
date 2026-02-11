@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { z } from "zod";
 import User from "../models/user.model.js";
 import { formatZodError } from "../utils/zodError.helper.js";
@@ -33,9 +34,17 @@ export const createUser = async (req, res) => {
       password: hashedPassword,
       role,
     });
+
+    const token = jwt.sign(
+      { _id: newUser._id, name: newUser.name },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" },
+    );
+
     res.status(201).json({
       message: "User created successfully",
       user: { name: newUser.name, email: newUser.email, role: newUser.role },
+      token,
     });
   } catch (error) {
     console.log(error);
