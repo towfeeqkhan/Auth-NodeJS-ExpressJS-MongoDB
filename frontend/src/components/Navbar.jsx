@@ -6,6 +6,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -25,7 +26,7 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  // Generate initials from user name
+  // Generate initials from user name (fallback if avatar image fails)
   const getInitials = (name) => {
     if (!name) return "?";
     return name
@@ -71,10 +72,22 @@ const Navbar = () => {
           {/* Avatar Button */}
           <button
             onClick={() => setIsDropdownOpen((prev) => !prev)}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm cursor-pointer transition-all active:scale-95"
+            className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden cursor-pointer transition-all active:scale-95 ring-2 ring-transparent hover:ring-indigo-500"
             aria-label="User menu"
           >
-            {getInitials(user.name)}
+            {user.avatar && !imgError ? (
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className="w-full h-full object-cover"
+                onError={() => setImgError(true)}
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-indigo-600 text-white font-semibold text-sm">
+                {getInitials(user.name)}
+              </div>
+            )}
           </button>
 
           {/* Dropdown Card */}
@@ -85,9 +98,23 @@ const Navbar = () => {
 
               {/* User Info */}
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-indigo-600 text-white font-bold text-xl mb-3">
-                  {getInitials(user.name)}
+                {/* Large Avatar in Card */}
+                <div className="w-16 h-16 rounded-full overflow-hidden mb-3 ring-2 ring-indigo-500/50">
+                  {user.avatar && !imgError ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.name}
+                      className="w-full h-full object-cover"
+                      onError={() => setImgError(true)}
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-indigo-600 text-white font-bold text-xl">
+                      {getInitials(user.name)}
+                    </div>
+                  )}
                 </div>
+
                 <h3 className="text-white text-lg font-semibold">
                   {user.name}
                 </h3>
