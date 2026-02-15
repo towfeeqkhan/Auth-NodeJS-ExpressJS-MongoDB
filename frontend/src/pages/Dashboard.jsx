@@ -2,22 +2,8 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
 const Dashboard = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <p className="text-white text-lg animate-pulse">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!user) {
-    // Not authenticated — redirect
-    navigate("/login");
-    return null;
-  }
 
   const handleLogout = async () => {
     await logout();
