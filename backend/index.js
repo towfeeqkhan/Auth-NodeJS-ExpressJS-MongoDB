@@ -1,4 +1,5 @@
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import express from "express";
 import connectDB from "./config/db.js";
 import "./config/passport.js";
