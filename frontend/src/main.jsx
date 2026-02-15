@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import RedirectIfAuthenticated from "./components/RedirectIfAuthenticated.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import "./index.css";
 import MainLayout from "./layout/MainLayout.jsx";
@@ -16,8 +17,22 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { path: "/", element: <Homepage /> },
-      { path: "/login", element: <Login /> },
-      { path: "/register", element: <Register /> },
+      {
+        path: "/login",
+        element: (
+          <RedirectIfAuthenticated>
+            <Login />
+          </RedirectIfAuthenticated>
+        ),
+      },
+      {
+        path: "/register",
+        element: (
+          <RedirectIfAuthenticated>
+            <Register />
+          </RedirectIfAuthenticated>
+        ),
+      },
       {
         path: "/dashboard",
         element: (
